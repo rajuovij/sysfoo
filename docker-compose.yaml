@@ -1,0 +1,7 @@
+version: "3.8"
+
+services:
+  sysfoo:
+    image: rajuovij/sysfoo:latest
+    ports:
+      - 8889:8080

@@ -1,22 +1,61 @@
 pipeline {
-  agent any
+  agent none
   stages {
     stage('Build') {
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11-slim'
+        }
+
+      }
       steps {
         sh 'mvn compile'
       }
     }
 
     stage('Test') {
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11-slim'
+        }
+
+      }
       steps {
         sh 'mvn clean test'
       }
     }
 
     stage('Package') {
+      when { branch 'master' }
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11-slim'
+        }
+
+      }
       steps {
         sh 'mvn package -DskipTest'
         archiveArtifacts 'target/*.war'
+      }
+    }
+
+    stage('B&P') {
+      when { branch 'master' }
+      agent any
+      steps {
+        script {
+          docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
+
+            def dockerImage = docker.build("rajuovij/sysfoo:v${env.BUILD_ID}", "./")
+
+            dockerImage.push()
+
+            dockerImage.push("latest")
+            dockerImage.push("dev")
+
+          }
+        }
+
       }
     }
 

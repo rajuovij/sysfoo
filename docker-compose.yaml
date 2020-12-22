@@ -4,4 +4,4 @@ services:
   sysfoo:
     image: rajuovij/sysfoo:latest
     ports:
-      - 8889:8080
+      - 8888:8080
